@@ -1,45 +1,55 @@
 Summary:	Host/service/network monitoring agent for Nagios
 Name:		nrpe
-Version:	2.5.2
+Version:	2.7.1
 Release:	%mkrel 1
 License:	GPL
-Group:		Networking/Other
+Group:		System/Servers
 URL:		http://sourceforge.net/projects/nagios/
-Source0:	http://prdownloads.sourceforge.net/nagios/%{name}-%{version}.tar.bz2
+Source0:	http://prdownloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
+Source1:	nrpe.init
+Patch0:		nrpe_check_control.diff
+Patch1:		nrpe-mdv_conf.diff
+BuildRequires:	nagios
 BuildRequires:	openssl-devel
+BuildRequires:	openssl
+BuildRequires:	tcp_wrappers-devel
+Requires:	tcp_wrappers
 Requires:	nagios-plugins
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-The purpose of this addon is to allow you to execute Nagios
-plugins on a remote host in as transparent a manner as possible.
+The purpose of this addon is to allow you to execute Nagios plugins on a remote
+host in as transparent a manner as possible.
 
-Nrpe is a system daemon that will execute various Nagios plugins
-locally on behalf of a remote (monitoring) host that uses the
-check_nrpe plugin.  Various plugins that can be executed by the
-daemon are available at:
+Nrpe is a system daemon that will execute various Nagios plugins locally on
+behalf of a remote (monitoring) host that uses the check_nrpe plugin. Various
+plugins that can be executed by the daemon are available at:
 http://sourceforge.net/projects/nagiosplug
 
 This package provides the core agent.
 
-%package	plugin
-Summary:	Provides nrpe plugin for Nagios
+%package -n	nagios-check_nrpe
+Summary:	NRPE Plugin for Nagios
 Group:		Networking/Other
 Requires:	nagios-plugins
 
-%description	plugin
-Nrpe is a system daemon that will execute various Nagios plugins
-locally on behalf of a remote (monitoring) host that uses the
-check_nrpe plugin.  Various plugins that can be executed by the
-daemon are available at:
+%description -n	nagios-check_nrpe
+Nrpe is a system daemon that will execute various Nagios plugins locally on
+behalf of a remote (monitoring) host that uses the check_nrpe plugin. Various
+plugins that can be executed by the daemon are available at:
 http://sourceforge.net/projects/nagiosplug
 
 This package provides the nrpe plugin for Nagios-related applications.
 
 %prep
+
 %setup -q
+%patch0 -p0
+%patch1 -p0
+
+cp %{SOURCE1} nrpe.init
 
 %build
 
@@ -48,21 +58,54 @@ This package provides the nrpe plugin for Nagios-related applications.
     --with-nrpe-port=5666 \
     --with-nrpe-user=nagios \
     --with-nrpe-grp=nagios \
-    --sbindir=%{_libdir}/nagios/cgi \
+    --bindir=%{_sbindir} \
     --libexecdir=%{_libdir}/nagios/plugins \
     --datadir=%{_datadir}/nagios \
-    --localstatedir=%{_var}/log/nagios \
+    --localstatedir=/var/spool/nagios \
     --sysconfdir=%{_sysconfdir}/nagios
 
 %make
 
-%install
-%{__rm} -rf $RPM_BUILD_ROOT
+gcc %{optflags} -o contrib/nrpe_check_control contrib/nrpe_check_control.c
 
-install -m755 src/check_nrpe -D $RPM_BUILD_ROOT%{_libdir}/nagios/plugins/check_nrpe
-install -m755 src/nrpe -D $RPM_BUILD_ROOT%{_bindir}/nrpe
-install -m755 init-script -D $RPM_BUILD_ROOT%{_initrddir}/nrpe
-install -m644 sample-config/nrpe.cfg -D $RPM_BUILD_ROOT%{_sysconfdir}/nagios/nrpe.cfg
+%install
+rm -rf %{buildroot}
+
+install -d %{buildroot}%{_sysconfdir}/nagios/plugins.d
+install -d %{buildroot}%{_initrddir}
+install -d %{buildroot}%{_sbindir}
+install -d %{buildroot}%{_libdir}/nagios/plugins
+install -d %{buildroot}/var/run/%{name}
+
+install -m0755 src/check_nrpe %{buildroot}%{_libdir}/nagios/plugins/check_nrpe
+install -m0755 contrib/nrpe_check_control %{buildroot}%{_libdir}/nagios/plugins/nrpe_check_control
+install -m0755 src/nrpe %{buildroot}%{_sbindir}/nrpe
+install -m0755 nrpe.init %{buildroot}%{_initrddir}/nrpe
+install -m0644 sample-config/nrpe.cfg %{buildroot}%{_sysconfdir}/nagios/nrpe.cfg
+
+cat > check_nrpe.cfg << EOF
+# this command runs a program \$ARG1\$ with arguments \$ARG2\$
+define command {
+	command_name	check_nrpe
+	command_line	%{_libdir}/nagios/plugins/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$ -a \$ARG2\$
+}
+
+# this command runs a program \$ARG1\$ with no arguments
+define command {
+	command_name	check_nrpe_1arg
+	command_line	%{_libdir}/nagios/plugins/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$
+}
+EOF
+install -m0644 check_nrpe.cfg %{buildroot}%{_sysconfdir}/nagios/plugins.d/check_nrpe.cfg
+
+
+cat > nrpe_check_control.cfg << EOF
+define command {
+	command_name	nrpe_check_control
+	command_line	%{_libdir}/nagios/plugins/nrpe_check_control \$SERVICESTATE\$ \$SERVICESTATETYPE\$ \$SERVICEATTEMPT\$ "\$HOSTNAME\$"
+}
+EOF
+install -m0644 nrpe_check_control.cfg %{buildroot}%{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
 
 %post
 %_post_service %{name}
@@ -70,18 +113,45 @@ install -m644 sample-config/nrpe.cfg -D $RPM_BUILD_ROOT%{_sysconfdir}/nagios/nrp
 %preun
 %_preun_service %{name}
 
+%post -n nagios-check_nrpe
+/sbin/service nagios condrestart > /dev/null 2>/dev/null || :
+
+%postun -n nagios-check_nrpe
+/sbin/service nagios condrestart > /dev/null 2>/dev/null || :
+
 %clean
-%{__rm} -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
 %doc README LEGAL README.SSL Changelog SECURITY
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/nrpe.cfg
 %attr(0755,root,root) %{_initrddir}/nrpe
-%attr(0755,root,root) %{_bindir}/nrpe
+%attr(0755,root,root) %{_sbindir}/nrpe
+%attr(0755,nagios,nagios) %dir /var/run/%{name}
 
-%files plugin
+%files -n nagios-check_nrpe
 %defattr(-,root,root)
-%doc README LEGAL README.SSL Changelog SECURITY
+%doc contrib/README.nrpe_check_control
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/plugins.d/check_nrpe.cfg
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
 %attr(0755,root,root) %{_libdir}/nagios/plugins/check_nrpe
+%attr(0755,root,root) %{_libdir}/nagios/plugins/nrpe_check_control
 
+%changelog
+* Wed Apr 11 2007 Oden Eriksson <oeriksson@mandriva.com> 2.7.1-1mdv2007.1
+- 2.7.1
+- added the nrpe_check_control plugin
+
+* Thu Jul 13 2006 Oden Eriksson <oeriksson@mandriva.com> 2.5.2-1mdv2007.0
+- 2.5.2
+
+* Wed Nov 30 2005 Oden Eriksson <oeriksson@mandriva.com> 2.0-3mdk
+- rebuilt against openssl-0.9.8a
+
+* Fri Sep 10 2004 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 2.0-2mdk
+- fix path to conf file 
+- fix requires
+
+* Fri Sep 10 2004 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 2.0-1mdk
+- initial mdk release
