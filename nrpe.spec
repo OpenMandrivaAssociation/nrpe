@@ -1,6 +1,6 @@
 Summary:	Host/service/network monitoring agent for Nagios
 Name:		nrpe
-Version:	2.7.1
+Version:	2.8.1
 Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
@@ -57,7 +57,9 @@ cp %{SOURCE1} nrpe.init
     --with-init-dir=%{_initrddir} \
     --with-nrpe-port=5666 \
     --with-nrpe-user=nagios \
-    --with-nrpe-grp=nagios \
+    --with-nrpe-group=nagios \
+    --with-nagios-user=nagios \
+    --with-nagios-group=nagios \
     --bindir=%{_sbindir} \
     --libexecdir=%{_libdir}/nagios/plugins \
     --datadir=%{_datadir}/nagios \
@@ -124,7 +126,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc README LEGAL README.SSL Changelog SECURITY
+%doc README LEGAL README.SSL Changelog SECURITY NRPE.pdf
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/nrpe.cfg
 %attr(0755,root,root) %{_initrddir}/nrpe
 %attr(0755,root,root) %{_sbindir}/nrpe
@@ -137,21 +139,3 @@ rm -rf %{buildroot}
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
 %attr(0755,root,root) %{_libdir}/nagios/plugins/check_nrpe
 %attr(0755,root,root) %{_libdir}/nagios/plugins/nrpe_check_control
-
-%changelog
-* Wed Apr 11 2007 Oden Eriksson <oeriksson@mandriva.com> 2.7.1-1mdv2007.1
-- 2.7.1
-- added the nrpe_check_control plugin
-
-* Thu Jul 13 2006 Oden Eriksson <oeriksson@mandriva.com> 2.5.2-1mdv2007.0
-- 2.5.2
-
-* Wed Nov 30 2005 Oden Eriksson <oeriksson@mandriva.com> 2.0-3mdk
-- rebuilt against openssl-0.9.8a
-
-* Fri Sep 10 2004 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 2.0-2mdk
-- fix path to conf file 
-- fix requires
-
-* Fri Sep 10 2004 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 2.0-1mdk
-- initial mdk release
