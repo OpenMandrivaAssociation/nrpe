@@ -1,7 +1,7 @@
 Summary:	Host/service/network monitoring agent for Nagios
 Name:		nrpe
 Version:	2.9
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://sourceforge.net/projects/nagios/
@@ -14,7 +14,6 @@ BuildRequires:	openssl-devel
 BuildRequires:	openssl
 BuildRequires:	tcp_wrappers-devel
 Requires:	tcp_wrappers
-Requires:	nagios-plugins
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
