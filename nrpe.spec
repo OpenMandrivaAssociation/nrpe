@@ -1,7 +1,7 @@
 Summary:	Host/service/network monitoring agent for Nagios
 Name:		nrpe
 Version:	2.11
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://sourceforge.net/projects/nagios/
@@ -63,8 +63,8 @@ cp %{SOURCE1} nrpe.init
     --libexecdir=%{_libdir}/nagios/plugins \
     --datadir=%{_datadir}/nagios \
     --localstatedir=/var/spool/nagios \
-    --sysconfdir=%{_sysconfdir}/nagios
-
+    --sysconfdir=%{_sysconfdir}/nagios \
+    --enable-command-args
 %make
 
 gcc %{optflags} -o contrib/nrpe_check_control contrib/nrpe_check_control.c
