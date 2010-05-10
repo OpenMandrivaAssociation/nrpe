@@ -114,12 +114,6 @@ install -m0644 nrpe_check_control.cfg %{buildroot}%{_sysconfdir}/nagios/plugins.
 %preun
 %_preun_service %{name}
 
-%post -n nagios-check_nrpe
-/sbin/service nagios condrestart > /dev/null 2>/dev/null || :
-
-%postun -n nagios-check_nrpe
-/sbin/service nagios condrestart > /dev/null 2>/dev/null || :
-
 %clean
 rm -rf %{buildroot}
 
