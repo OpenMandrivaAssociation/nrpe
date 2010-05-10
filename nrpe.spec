@@ -126,15 +126,15 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root)
 %doc README LEGAL README.SSL Changelog SECURITY docs/NRPE.pdf
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/nrpe.cfg
-%attr(0755,root,root) %{_initrddir}/nrpe
-%attr(0755,root,root) %{_sbindir}/nrpe
-%attr(0755,nagios,nagios) %dir /var/run/%{name}
+%config(noreplace) %{_sysconfdir}/nagios/nrpe.cfg
+%{_initrddir}/nrpe
+%{_sbindir}/nrpe
+%dir /var/run/%{name}
 
 %files -n nagios-check_nrpe
 %defattr(-,root,root)
 %doc contrib/README.nrpe_check_control
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/plugins.d/check_nrpe.cfg
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
-%attr(0755,root,root) %{_libdir}/nagios/plugins/check_nrpe
-%attr(0755,root,root) %{_libdir}/nagios/plugins/nrpe_check_control
+%config(noreplace) %{_sysconfdir}/nagios/plugins.d/check_nrpe.cfg
+%config(noreplace) %{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
+%{_libdir}/nagios/plugins/check_nrpe
+%{_libdir}/nagios/plugins/nrpe_check_control
