@@ -84,26 +84,26 @@ install -m0755 src/nrpe %{buildroot}%{_sbindir}/nrpe
 install -m0755 nrpe.init %{buildroot}%{_initrddir}/nrpe
 install -m0644 sample-config/nrpe.cfg %{buildroot}%{_sysconfdir}/nagios/nrpe.cfg
 
-cat > check_nrpe.cfg << EOF
-# this command runs a program \$ARG1\$ with arguments \$ARG2\$
+cat > check_nrpe.cfg <<'EOF'
+# this command runs a program $ARG1$ with arguments $ARG2$
 define command {
 	command_name	check_nrpe
-	command_line	%{_libdir}/nagios/plugins/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$ -a \$ARG2\$
+	command_line	%{_libdir}/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$ -a $ARG2$
 }
 
-# this command runs a program \$ARG1\$ with no arguments
+# this command runs a program $ARG1$ with no arguments
 define command {
 	command_name	check_nrpe_1arg
-	command_line	%{_libdir}/nagios/plugins/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$
+	command_line	%{_libdir}/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
 }
 EOF
 install -m0644 check_nrpe.cfg %{buildroot}%{_sysconfdir}/nagios/plugins.d/check_nrpe.cfg
 
 
-cat > nrpe_check_control.cfg << EOF
+cat > nrpe_check_control.cfg <<'EOF'
 define command {
 	command_name	nrpe_check_control
-	command_line	%{_libdir}/nagios/plugins/nrpe_check_control \$SERVICESTATE\$ \$SERVICESTATETYPE\$ \$SERVICEATTEMPT\$ "\$HOSTNAME\$"
+	command_line	%{_libdir}/nagios/plugins/nrpe_check_control $SERVICESTATE$ $SERVICESTATETYPE$ $SERVICEATTEMPT$ "$HOSTNAME$"
 }
 EOF
 install -m0644 nrpe_check_control.cfg %{buildroot}%{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
