@@ -108,11 +108,17 @@ define command {
 EOF
 install -m0644 nrpe_check_control.cfg %{buildroot}%{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
 
+%pre
+%_pre_useradd nagios %{_localstatedir}/log/nagios /bin/sh
+
 %post
 %_post_service %{name}
 
 %preun
 %_preun_service %{name}
+
+%postun
+%_postun_userdel nagios
 
 %clean
 rm -rf %{buildroot}
