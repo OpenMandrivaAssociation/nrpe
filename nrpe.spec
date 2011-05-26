@@ -67,7 +67,7 @@ cp %{SOURCE1} nrpe.init
     --enable-command-args
 %make
 
-gcc %{optflags} -o contrib/nrpe_check_control contrib/nrpe_check_control.c
+gcc %{optflags} %{ldflags} -o contrib/nrpe_check_control contrib/nrpe_check_control.c
 
 %install
 rm -rf %{buildroot}
