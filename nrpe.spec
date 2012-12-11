@@ -67,7 +67,7 @@ cp %{SOURCE1} nrpe.init
     --enable-command-args
 %make
 
-gcc %{optflags} %{ldflags} -o contrib/nrpe_check_control contrib/nrpe_check_control.c
+gcc %{optflags} -o contrib/nrpe_check_control contrib/nrpe_check_control.c
 
 %install
 rm -rf %{buildroot}
@@ -139,3 +139,85 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/nagios/plugins.d/nrpe_check_control.cfg
 %{_libdir}/nagios/plugins/check_nrpe
 %{_libdir}/nagios/plugins/nrpe_check_control
+
+
+%changelog
+* Tue Sep 14 2010 Michael Scherer <misc@mandriva.org> 2.12-5mdv2011.0
++ Revision: 578194
+- fix License
+- fix unowned directory ( as nrpe is likely to be installed when nagios is not there )
+
+* Fri May 14 2010 Guillaume Rousse <guillomovitch@mandriva.org> 2.12-4mdv2010.1
++ Revision: 544796
+- add nagios user at installation (fix #59203)
+- cleanup
+- drop useless %%post, as we now use filetrggiers
+- %files section cleanup
+
+* Fri Apr 16 2010 Funda Wang <fwang@mandriva.org> 2.12-3mdv2010.1
++ Revision: 535273
+- rebuild
+
+* Fri Sep 04 2009 Thierry Vignaud <tv@mandriva.org> 2.12-2mdv2010.0
++ Revision: 430183
+- rebuild
+
+* Sun Sep 07 2008 Oden Eriksson <oeriksson@mandriva.com> 2.12-1mdv2009.0
++ Revision: 282159
+- 2.12
+
+* Fri Aug 08 2008 Thierry Vignaud <tv@mandriva.org> 2.11-4mdv2009.0
++ Revision: 268289
+- rebuild early 2009.0 package (before pixel changes)
+
+  + Guillaume Rousse <guillomovitch@mandriva.org>
+    - sync initscript with ndo2db one
+
+* Thu May 15 2008 Guillaume Rousse <guillomovitch@mandriva.org> 2.11-3mdv2009.0
++ Revision: 207538
+- LSB headers in initscript
+
+* Tue Apr 29 2008 Guillaume Rousse <guillomovitch@mandriva.org> 2.11-2mdv2009.0
++ Revision: 198954
+- enable arguments
+
+* Mon Feb 11 2008 Oden Eriksson <oeriksson@mandriva.com> 2.11-1mdv2008.1
++ Revision: 165295
+- 2.11
+
+* Sun Feb 10 2008 Guillaume Rousse <guillomovitch@mandriva.org> 2.9-2mdv2008.1
++ Revision: 164896
+- no need to enforce a dependency on nagios-plugins, they are tons of nagios checks available in other packages
+
+  + Olivier Blin <oblin@mandriva.com>
+    - restore BuildRoot
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - kill re-definition of %%buildroot on Pixel's request
+
+* Fri Oct 12 2007 Oden Eriksson <oeriksson@mandriva.com> 2.9-1mdv2008.1
++ Revision: 97376
+- 2.9
+
+* Fri May 11 2007 Oden Eriksson <oeriksson@mandriva.com> 2.8.1-1mdv2008.0
++ Revision: 26291
+- 2.8.1
+
+* Tue Apr 17 2007 Oden Eriksson <oeriksson@mandriva.com> 2.7.1-1mdv2008.0
++ Revision: 13802
+- 2.7.1
+
+
+* Thu Jul 13 2006 Oden Eriksson <oeriksson@mandriva.com> 2.5.2-1mdv2007.0
+- 2.5.2
+
+* Wed Nov 30 2005 Oden Eriksson <oeriksson@mandriva.com> 2.0-3mdk
+- rebuilt against openssl-0.9.8a
+
+* Fri Sep 10 2004 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 2.0-2mdk
+- fix path to conf file 
+- fix requires
+
+* Fri Sep 10 2004 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 2.0-1mdk
+- initial mdk release
+

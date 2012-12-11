@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# chkconfig: 2345 80 30
+
+### BEGIN INIT INFO
+# Provides: nrpe
+# Required-Start: $network
+# Requires-Stop: $network
+# Default-Start:  3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Starts and stops NRPE
+# Description: Nagios Remote Plugin Execution daemon
+### END INIT INFO
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+[ -f /etc/nagios/nrpe.cfg ] || exit 0
+
+RETVAL=0
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting nrpe: "
+	daemon nrpe -c /etc/nagios/nrpe.cfg -d
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/nrpe
+	;;
+  stop)
+	echo -n "Stopping nrpe: "
+	killproc nrpe
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/nrpe
+	;;
+  status)
+	status nrpe
+	RETVAL=$?
+	;;
+  restart|reload)
+	$0 stop
+	$0 start
+	RETVAL=$?
+	;;
+condrestart)
+	[ -f /var/lock/subsys/nrpe ] && $0 restart
+	RETVAL=$?
+	;;
+  *)
+	echo "Usage: nrpe {start|stop|status|restart|condrestart|reload}"
+	exit 1
+esac
+
+exit $RETVAL
