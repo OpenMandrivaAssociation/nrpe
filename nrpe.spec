@@ -4,7 +4,7 @@ Version:	2.12
 Release:	%mkrel 5
 License:	GPLv2
 Group:		System/Servers
-URL:		http://sourceforge.net/projects/nagios/
+URL:		https://sourceforge.net/projects/nagios/
 Source0:	http://prdownloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
 Source1:	nrpe.init
 Patch0:		nrpe_check_control.diff
