@@ -9,6 +9,11 @@ Source0:	http://prdownloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
 Source1:	nrpe.init
 Patch0:		nrpe_check_control.diff
 Patch1:		nrpe-mdv_conf.diff
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	nagios
 BuildRequires:	openssl-devel
 BuildRequires:	openssl
