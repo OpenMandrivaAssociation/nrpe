@@ -1,7 +1,7 @@
 Summary:	Host/service/network monitoring agent for Nagios
 Name:		nrpe
 Version:	2.12
-Release:	%mkrel 5
+Release:	6
 License:	GPLv2
 Group:		System/Servers
 URL:		https://sourceforge.net/projects/nagios/
